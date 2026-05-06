@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+}
+
+model Profile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  email            String   @unique
+  role             Role     @default(USER)
+  stripeCustomerId String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  subscriptions Subscription[]
+  transactions  Transaction[]
+  logs          Log[]
+  funnelEvents  FunnelEvent[]
+}
+
+model Plan {
+  id            String   @id // ex: 'quinzenal', 'mensal', 'vitalicio'
+  name          String
+  price         Decimal  @db.Decimal(10, 2)
+  interval      String   // ex: 'fortnightly', 'monthly', 'lifetime'
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  subscriptions Subscription[]
+  transactions  Transaction[]
+}
+
+model Subscription {
+  id              String             @id @default(cuid())
+  userId          String
+  planId          String
+  status          SubscriptionStatus @default(ACTIVE)
+  startDate       DateTime           @default(now())
+  nextBillingDate DateTime?
+  stripeId        String?            @unique
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  user Profile @relation(fields: [userId], references: [userId])
+  plan Plan    @relation(fields: [planId], references: [id])
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  userId          String
+  planId          String
+  amount          Decimal  @db.Decimal(10, 2)
+  paymentMethod   String
+  status          String   @default("PENDING")
+  rapdynTxId      String?
+  qrCode          String?  @db.Text
+  qrCodeCopyPaste String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user Profile @relation(fields: [userId], references: [userId])
+  plan Plan    @relation(fields: [planId], references: [id])
+}
+
+model Log {
+  id        String   @id @default(cuid())
+  userId    String?
+  level     String   // INFO, ERROR
+  message   String
+  payload   String?  @db.Text
+  response  String?  @db.Text
+  createdAt DateTime @default(now())
+
+  user Profile? @relation(fields: [userId], references: [userId])
+}
+
+model FunnelEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  step      String   // view_checkout, start_payment, paid
+  createdAt DateTime @default(now())
+
+  user Profile @relation(fields: [userId], references: [userId])
+}
+
+model AdminConfig {
+  id             Int      @id @default(1)
+  clientId       String?
+  clientSecret   String?
+  apiToken       String?  @db.Text
+  webhookSecret  String?
+  password       String
+  updatedAt      DateTime @updatedAt
+}

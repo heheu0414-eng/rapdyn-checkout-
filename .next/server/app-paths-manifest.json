@@ -1,0 +1,15 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/checkout/page": "app/checkout/page.js",
+  "/login/page": "app/login/page.js",
+  "/api/cron/check-subscriptions/route": "app/api/cron/check-subscriptions/route.js",
+  "/api/cron/billing/route": "app/api/cron/billing/route.js",
+  "/api/webhook/rapdyn/route": "app/api/webhook/rapdyn/route.js",
+  "/api/checkout/route": "app/api/checkout/route.js",
+  "/api/webhooks/stripe/route": "app/api/webhooks/stripe/route.js",
+  "/admin/logs/page": "app/admin/logs/page.js",
+  "/admin/dashboard/page": "app/admin/dashboard/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/admin/plans/page": "app/admin/plans/page.js",
+  "/admin/settings/page": "app/admin/settings/page.js"
+}
